@@ -9,8 +9,8 @@ Group:		Applications/Mail
 Source0:	http://prdownloads.sourceforge.net/archivemail/%{name}-%{version}.tar.gz
 URL:		http://archivemail.sourceforge.net/
 BuildRequires:	python-devel >= 2.0
-BuildRequires:  rpm-pythonprov
-%pyrequires_eq  python
+BuildRequires:	rpm-pythonprov
+%pyrequires_eq	python
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -67,5 +67,6 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %files
 %defattr(644,root,root,755)
+%doc CHANGELOG FAQ README TODO
 %attr(755,root,root) %{_bindir}/*
 %{_mandir}/man1/*
