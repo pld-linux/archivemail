@@ -1,5 +1,4 @@
 
-%include  /usr/lib/rpm/macros.python
 
 Summary:	Archive and compress old email
 Summary(pl):	Archiwizowanie starej poczty
