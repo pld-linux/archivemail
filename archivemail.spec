@@ -8,7 +8,7 @@ Version:	0.6.1
 Release:	1
 License:	GPL
 Group:		Applications/Mail
-Source0:	http://prdownloads.sourceforge.net/archivemail/%{name}-%{version}.tar.gz
+Source0:	http://dl.sourceforge.net/archivemail/%{name}-%{version}.tar.gz
 URL:		http://archivemail.sourceforge.net/
 BuildRequires:	python-devel >= 2.0
 BuildRequires:	rpm-pythonprov
