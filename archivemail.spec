@@ -4,15 +4,18 @@ Summary:	Archive and compress old email
 Summary(pl):	Archiwizowanie starej poczty
 Name:		archivemail
 Version:	0.6.1
-Release:	1
+Release:	2
 License:	GPL
 Group:		Applications/Mail
 Source0:	http://dl.sourceforge.net/archivemail/%{name}-%{version}.tar.gz
 # Source0-md5:	aaf071effc9576cc14f3b0eee1d2321e
+Patch0:	 	%{name}-python23.patch
 URL:		http://archivemail.sourceforge.net/
 BuildRequires:	python-devel >= 2.0
 BuildRequires:	rpm-pythonprov
 %pyrequires_eq	python
+# for warnings.py
+Requires:	python-modules
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -50,6 +53,7 @@ skrzynek pocztowych: IMAP, Maildir, MH oraz mbox.
 
 %prep
 %setup -q
+%patch0
 
 %build
 # Nothing to be done here.
