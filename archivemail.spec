@@ -11,7 +11,6 @@ Source0:	http://dl.sourceforge.net/archivemail/%{name}-%{version}.tar.gz
 Patch0:	 	%{name}-python23.patch
 URL:		http://archivemail.sourceforge.net/
 BuildRequires:	python-devel >= 2.0
-BuildRequires:	rpm-pythonprov
 %pyrequires_eq	python
 # for warnings.py
 Requires:	python-modules
