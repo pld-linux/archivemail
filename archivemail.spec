@@ -33,7 +33,7 @@ It supports IMAP, Maildir, MH and mbox-format mailboxes.
 
 %description -l pl
 Archivemail jest, napisanym w jêzyku Python, narzêdziem s³u¿±cym
-achiwizowaniu i kompresowaniu starej poczty.
+archiwizowaniu i kompresowaniu starej poczty.
 
 Za pomoc± programu mo¿na przenosiæ wiadomo¶ci starsze ni¿ okre¶lona liczba
 dni do oddzielnej skrzynki w formacie mbox, która jest kompresowana przy
