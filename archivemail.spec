@@ -1,10 +1,9 @@
 
-
 Summary:	Archive and compress old email
 Summary(pl):	Archiwizowanie starej poczty
 Name:		archivemail
 Version:	0.6.1
-Release:	2
+Release:	3
 License:	GPL
 Group:		Applications/Mail
 Source0:	http://dl.sourceforge.net/archivemail/%{name}-%{version}.tar.gz
