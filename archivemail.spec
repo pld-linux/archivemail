@@ -35,18 +35,18 @@ It supports IMAP, Maildir, MH and mbox-format mailboxes.
 Archivemail jest, napisanym w jêzyku Python, narzêdziem s³u¿±cym
 archiwizowaniu i kompresowaniu starej poczty.
 
-Za pomoc± programu mo¿na przenosiæ wiadomo¶ci starsze ni¿ okre¶lona liczba
-dni do oddzielnej skrzynki w formacie mbox, która jest kompresowana przy
-u¿yciu programu 'gzip'.
+Za pomoc± programu mo¿na przenosiæ wiadomo¶ci starsze ni¿ okre¶lona
+liczba dni do oddzielnej skrzynki w formacie mbox, która jest
+kompresowana przy u¿yciu programu 'gzip'.
 
-Przyk³adowo, od 6 lat by³e¶ zapisany na listê 'linux-kernel' i Twoja
-skrzynka zajmuje ju¿ ponad 160MB, której otwarcie zajmuje trochê
+Przyk³adowo, kto¶ jest od 6 lat zapisany na listê 'linux-kernel' i
+jego skrzynka zajmuje ju¿ ponad 160MB, a jej otwarcie trwa trochê
 czasu. Archivemail mo¿e przenie¶æ wszystkie wiadomo¶ci, powiedzmy
 sprzed 6 miesiêcy, do oddzielnej, skompresowanej skrzynki, zostawiaj±c
 tylko najnowsze listy.
 
-Archivemail potrafi zapisywaæ i odczytywaæ nastêpuj±ce formaty skrzynek
-pocztowych: IMAP, Maildir, MH oraz mbox.
+Archivemail potrafi zapisywaæ i odczytywaæ nastêpuj±ce formaty
+skrzynek pocztowych: IMAP, Maildir, MH oraz mbox.
 
 %prep
 %setup -q
