@@ -12,7 +12,6 @@ Source0:	http://dl.sourceforge.net/archivemail/%{name}-%{version}.tar.gz
 # Source0-md5:	aaf071effc9576cc14f3b0eee1d2321e
 URL:		http://archivemail.sourceforge.net/
 BuildRequires:	python-devel >= 2.0
-BuildRequires:	python-devel <  2.3
 BuildRequires:	rpm-pythonprov
 %pyrequires_eq	python
 BuildArch:	noarch
