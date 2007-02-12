@@ -1,6 +1,6 @@
 
 Summary:	Archive and compress old email
-Summary(pl):	Archiwizowanie starej poczty
+Summary(pl.UTF-8):   Archiwizowanie starej poczty
 Name:		archivemail
 Version:	0.6.1
 Release:	3
@@ -32,21 +32,21 @@ mailbox, and leave you with just the most recent messages.
 
 It supports IMAP, Maildir, MH and mbox-format mailboxes.
 
-%description -l pl
-Archivemail jest, napisanym w jêzyku Python, narzêdziem s³u¿±cym
+%description -l pl.UTF-8
+Archivemail jest, napisanym w jÄ™zyku Python, narzÄ™dziem sÅ‚uÅ¼Ä…cym
 archiwizowaniu i kompresowaniu starej poczty.
 
-Za pomoc± programu mo¿na przenosiæ wiadomo¶ci starsze ni¿ okre¶lona
-liczba dni do oddzielnej skrzynki w formacie mbox, która jest
-kompresowana przy u¿yciu programu 'gzip'.
+Za pomocÄ… programu moÅ¼na przenosiÄ‡ wiadomoÅ›ci starsze niÅ¼ okreÅ›lona
+liczba dni do oddzielnej skrzynki w formacie mbox, ktÃ³ra jest
+kompresowana przy uÅ¼yciu programu 'gzip'.
 
-Przyk³adowo, kto¶ jest od 6 lat zapisany na listê 'linux-kernel' i
-jego skrzynka zajmuje ju¿ ponad 160MB, a jej otwarcie trwa trochê
-czasu. Archivemail mo¿e przenie¶æ wszystkie wiadomo¶ci, powiedzmy
-sprzed 6 miesiêcy, do oddzielnej, skompresowanej skrzynki, zostawiaj±c
+PrzykÅ‚adowo, ktoÅ› jest od 6 lat zapisany na listÄ™ 'linux-kernel' i
+jego skrzynka zajmuje juÅ¼ ponad 160MB, a jej otwarcie trwa trochÄ™
+czasu. Archivemail moÅ¼e przenieÅ›Ä‡ wszystkie wiadomoÅ›ci, powiedzmy
+sprzed 6 miesiÄ™cy, do oddzielnej, skompresowanej skrzynki, zostawiajÄ…c
 tylko najnowsze listy.
 
-Archivemail potrafi zapisywaæ i odczytywaæ nastêpuj±ce formaty
+Archivemail potrafi zapisywaÄ‡ i odczytywaÄ‡ nastÄ™pujÄ…ce formaty
 skrzynek pocztowych: IMAP, Maildir, MH oraz mbox.
 
 %prep
