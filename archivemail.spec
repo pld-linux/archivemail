@@ -1,6 +1,6 @@
 
 Summary:	Archive and compress old email
-Summary(pl.UTF-8):   Archiwizowanie starej poczty
+Summary(pl.UTF-8):	Archiwizowanie starej poczty
 Name:		archivemail
 Version:	0.6.1
 Release:	3
