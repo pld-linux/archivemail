@@ -1,12 +1,12 @@
 Summary:	Archive and compress old email
 Summary(pl.UTF-8):	Archiwizowanie starej poczty
 Name:		archivemail
-Version:	0.7.0
-Release:	2
+Version:	0.7.2
+Release:	1
 License:	GPL
 Group:		Applications/Mail
 Source0:	http://dl.sourceforge.net/archivemail/%{name}-%{version}.tar.gz
-# Source0-md5:	087c9707daa6bb5c44cd052b6d71ce88
+# Source0-md5:	e444424688e6ec063e829176e4eb62e2
 Patch0:		%{name}-invalid-message.patch
 URL:		http://archivemail.sourceforge.net/
 BuildRequires:	python-devel >= 2.0
