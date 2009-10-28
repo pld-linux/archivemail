@@ -11,7 +11,7 @@ Index: archivemail/archivemail
      else:
          unexpected_error("unknown type: %s" % type)        
 -    assert(original)
-+    #assert(original)
++    assert(original is not None)
  
      cache = IdentityCache(mailbox_name)
  
