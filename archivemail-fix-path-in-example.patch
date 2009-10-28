@@ -1,0 +1,13 @@
+# Description: correct example invocation
+# Author: Serafeim Zanikolas <serzan@hellug.gr>
+--- archivemail-0.7.2.orig/examples/archivemail_all
++++ archivemail-0.7.2/examples/archivemail_all
+@@ -10,7 +10,7 @@
+ #
+ set -e
+ 
+-ARCMAIL="/usr/local/bin/archivemail --quiet --output-dir=$HOME/Mail/Archive/ "
++ARCMAIL="archivemail --quiet --output-dir=$HOME/Mail/Archive/ "
+ 
+ $ARCMAIL --days 14 $HOME/Mail/debian-user \
+                    $HOME/Mail/linux-kernel \

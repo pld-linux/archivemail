@@ -1,0 +1,17 @@
+# Description: add, document and test --all option
+# Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=476806
+# Author: Joey Hess <joeyh@debian.org>
+# Last-Update: 2008-08-14
+Index: archivemail/archivemail
+===================================================================
+--- archivemail.orig/archivemail	2008-08-14 21:24:03.000000000 +0100
++++ archivemail/archivemail	2008-08-14 21:24:12.000000000 +0100
+@@ -1278,7 +1278,7 @@
+         original = mailbox.MHMailbox(mailbox_name)
+     else:
+         unexpected_error("unknown type: %s" % type)        
+-    assert(original)
++    #assert(original)
+ 
+     cache = IdentityCache(mailbox_name)
+ 

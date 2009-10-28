@@ -2,11 +2,18 @@ Summary:	Archive and compress old email
 Summary(pl.UTF-8):	Archiwizowanie starej poczty
 Name:		archivemail
 Version:	0.7.2
-Release:	1
+Release:	2
 License:	GPL
 Group:		Applications/Mail
 Source0:	http://dl.sourceforge.net/archivemail/%{name}-%{version}.tar.gz
 # Source0-md5:	e444424688e6ec063e829176e4eb62e2
+Patch0:		%{name}-add-archive-name-switch.patch
+Patch1:		%{name}-empty-mailbox-objects-fix.patch
+Patch2:		%{name}-fix-path-in-example.patch
+Patch3:		%{name}-preserve-symlinks.patch
+Patch4:		%{name}-add-prefix-switch.patch
+Patch5:		%{name}-add-archive-all-switch.patch
+Patch6:		%{name}-relax-timestamps-test.patch
 URL:		http://archivemail.sourceforge.net/
 BuildRequires:	python-devel >= 2.0
 %pyrequires_eq	python
@@ -16,17 +23,17 @@ BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-Archivemail is a tool written in Python for archiving and
-compressing old email in mailboxes.
+Archivemail is a tool written in Python for archiving and compressing
+old email in mailboxes.
 
 It can move messages older than the specified number of days to a
 separate 'archive' mbox-format mailbox that is compressed with 'gzip'.
 
 For example, have you been subscribing to the 'linux-kernel' mailing
 list for the last 6 years and ended up with an 160-meg mailbox that
-Mutt is taking a long time to load? Archivemail can move all
-messages that are older than 6 months to a separate compressed
-mailbox, and leave you with just the most recent messages.
+Mutt is taking a long time to load? Archivemail can move all messages
+that are older than 6 months to a separate compressed mailbox, and
+leave you with just the most recent messages.
 
 It supports IMAP, Maildir, MH and mbox-format mailboxes.
 
@@ -49,26 +56,34 @@ skrzynek pocztowych: IMAP, Maildir, MH oraz mbox.
 
 %prep
 %setup -q
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
+
+%{__sed} -i -e 's,man/man1,%{_mandir}/man1,' setup.py
 
 %build
-# Nothing to be done here.
-./setup.py build
+%{__python} setup.py build
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d ${RPM_BUILD_ROOT}%{_mandir}
-./setup.py install \
+install -d $RPM_BUILD_ROOT%{_mandir}
+%{__python} setup.py install \
 	--prefix=%{_prefix} \
-	--root=${RPM_BUILD_ROOT}
+	--root=$RPM_BUILD_ROOT
 
-# This one is ugly.
-mv ${RPM_BUILD_ROOT}%{_prefix}/man/man1 ${RPM_BUILD_ROOT}%{_mandir}
+# Not a Python module, so drop the egg.
+rm -f $RPM_BUILD_ROOT%{py_sitescriptdir}/*.egg-info
 
 %clean
-rm -rf ${RPM_BUILD_ROOT}
+rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
 %doc CHANGELOG FAQ README TODO
-%attr(755,root,root) %{_bindir}/*
-%{_mandir}/man1/*
+%attr(755,root,root) %{_bindir}/archivemail
+%{_mandir}/man1/archivemail.1*

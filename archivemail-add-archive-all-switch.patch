@@ -1,0 +1,139 @@
+# Description: add, document and test --all option
+# Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=470675
+# Author: Serafeim Zanikolas <serzan@hellug.gr>
+# Last-Update: 2009-02-22
+Index: archivemail/archivemail
+===================================================================
+--- archivemail.orig/archivemail	2008-09-06 15:11:32.000000000 +0100
++++ archivemail/archivemail	2008-09-06 15:14:23.000000000 +0100
+@@ -179,6 +179,7 @@
+     delete_old_mail      = 0
+     dry_run              = 0
+     filter_append        = None
++    archive_all          = 0
+     include_flagged      = 0
+     lockfile_attempts    = 5  
+     lockfile_extension   = ".lock"
+@@ -209,14 +210,14 @@
+ 
+         """
+         try:
+-            opts, args = getopt.getopt(args, '?D:S:Vd:hno:F:P:qs:uvp:', 
++            opts, args = getopt.getopt(args, '?D:S:Vd:hno:F:P:qs:uvp:',
+                              ["date=", "days=", "delete", "dry-run", "help",
+                              "include-flagged", "no-compress", "output-dir=",
+                              "archive-name=",
+                              "filter-append=", "pwfile=", "dont-mangle",
+                              "preserve-unread", "quiet", "size=", "suffix=",
+                              "verbose", "version", "warn-duplicate", "copy",
+-                             "prefix="])
++                             "prefix=", "all"])
+         except getopt.error, msg:
+             user_error(msg)
+ 
+@@ -227,6 +228,8 @@
+                 if self.copy_old_mail: 
+                     user_error("found conflicting options --copy and --delete")
+                 self.delete_old_mail = 1
++            if o == ('--all'):
++                self.archive_all = 1
+             if o == '--include-flagged':
+                 self.include_flagged = 1
+             if o == '--no-compress':
+@@ -277,6 +280,9 @@
+             if o in ('-V', '--version'):
+                 print __version__ + "\n\n" + __copyright__
+                 sys.exit(0)
++        if self.archive_all and archive_by:
++            user_error("--all must not be used with other " +
++                       "filtering options")
+         return args
+ 
+     def sanity_check(self):
+@@ -681,6 +687,8 @@
+ mailbox compressed with gzip. 
+ 
+ Options are as follows:
++      --all             archive all messages (not to be used along with other
++                        filter switches; use with caution)
+   -d, --days=NUM        archive messages older than NUM days (default: %d)
+   -D, --date=DATE       archive messages older than DATE
+   -o, --output-dir=DIR  directory to store archives (default: same as original)
+@@ -1009,6 +1017,8 @@
+ 
+ def should_archive(message):
+     """Return true if we should archive the message, false otherwise"""
++    if options.archive_all:
++        return 1
+     old = 0
+     time_message = guess_delivery_time(message)
+     if options.date_old_max == None:
+Index: archivemail/archivemail.sgml
+===================================================================
+--- archivemail.orig/archivemail.sgml	2008-09-06 15:11:32.000000000 +0100
++++ archivemail/archivemail.sgml	2008-09-06 15:16:25.000000000 +0100
+@@ -119,6 +119,15 @@
+ 
+ <VarListEntry>
+ <Term>
++    <Option>--all</Option>
++</Term>
++<ListItem><Para>
++Archive _all_ messages. Not to be combined with other filter switches.
++</Para></ListItem>
++</VarListEntry>
++
++<VarListEntry>
++<Term>
+     <Option>-d <Replaceable/NUM/, --days=<Replaceable/NUM/</Option>
+ </Term>
+ <ListItem><Para>Archive messages older than <Replaceable/NUM/ days.  
+Index: archivemail/test_archivemail.py
+===================================================================
+--- archivemail.orig/test_archivemail.py	2008-09-06 15:13:17.000000000 +0100
++++ archivemail/test_archivemail.py	2008-09-06 19:58:49.000000000 +0100
+@@ -974,6 +974,44 @@
+         super(TestArchiveDryRun, self).tearDown()
+ 
+ 
++class TestArchiveAll(TestCaseInTempdir):
++    """make sure the 'all' option works"""
++    def setUp(self):
++        super(TestArchiveAll, self).setUp()
++        archivemail.options.quiet = 1
++
++    def testValidUse(self):
++        """test that it works when used without any other archive_by option"""
++        for execute in ("package", "system_long"):
++            self.setUp()
++            self.mbox_name = make_mbox(messages=3, hours_old=(24 * 12))
++            self.mbox = archivemail.Mbox(self.mbox_name)
++            if execute == "package":
++                archivemail.options.archive_all = 1
++                archivemail.archive(self.mbox_name)
++            elif execute == "system_long":
++                run = "./archivemail.py --all --quiet "\
++                        + "%s 2>&1 >/dev/null" % self.mbox_name
++                self.assertEqual(os.system(run), 0)
++            else:
++                sys.exit(1)
++            assert(os.path.exists(self.mbox_name))
++            self.assertTrue(self.mbox.is_empty())
++            self.tearDown()
++
++    def testInvalidUses(self):
++        """test that it gives up with invoked with either -d or -D"""
++        for arg in ["-d 30", "--days=30",\
++                    "-D 2008-07-30", "--date=2008-07-30"]:
++            run = ("./archivemail.py --all %s --quiet "\
++                    + "whatever >/dev/null 2>&1") % arg
++            self.assertEqual(os.system(run), 256)
++
++    def tearDown(self):
++        archivemail.options.archive_all = 0
++        archivemail.options.quiet = 0
++        super(TestArchiveAll, self).tearDown()
++
+ class TestArchiveDays(TestCaseInTempdir):
+     """make sure the 'days' option works"""
+     def setUp(self):

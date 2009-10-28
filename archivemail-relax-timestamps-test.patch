@@ -1,0 +1,48 @@
+# Description: add, document and test --all option
+# Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549736
+# Author: Nikolaus Schulz <microschulz@web.de>
+# Last-Update: 2009-10-10
+--- a/test_archivemail.py
++++ b/test_archivemail.py
+@@ -69,6 +69,8 @@
+         print "Try renaming it from 'archivemail' to 'archivemail.py'."
+     sys.exit(1)
+ 
++# precision of os.utime() when restoring mbox timestamps
++utimes_precision = 5
+ 
+ class TestCaseInTempdir(unittest.TestCase):
+     """Base class for testcases that need to create temporary files. 
+@@ -718,8 +720,8 @@
+             assert(os.path.exists(self.mbox_name))
+             new_atime = os.path.getatime(self.mbox_name)
+             new_mtime = os.path.getmtime(self.mbox_name)
+-            self.assertEqual(self.mtime, new_mtime)
+-            self.assertEqual(self.atime, new_atime)
++            self.assertAlmostEqual(self.mtime, new_mtime, utimes_precision)
++            self.assertAlmostEqual(self.atime, new_atime, utimes_precision)
+             self.tearDown()
+ 
+     def testMixed(self):
+@@ -741,8 +743,8 @@
+             assert(os.path.exists(self.mbox_name))
+             new_atime = os.path.getatime(self.mbox_name)
+             new_mtime = os.path.getmtime(self.mbox_name)
+-            self.assertEqual(self.mtime, new_mtime)
+-            self.assertEqual(self.atime, new_atime)
++            self.assertAlmostEqual(self.mtime, new_mtime, utimes_precision)
++            self.assertAlmostEqual(self.atime, new_atime, utimes_precision)
+             self.tearDown()
+ 
+     def testOld(self):
+@@ -764,8 +766,8 @@
+             assert(os.path.exists(self.mbox_name))
+             new_atime = os.path.getatime(self.mbox_name)
+             new_mtime = os.path.getmtime(self.mbox_name)
+-            self.assertEqual(self.mtime, new_mtime)
+-            self.assertEqual(self.atime, new_atime)
++            self.assertAlmostEqual(self.mtime, new_mtime, utimes_precision)
++            self.assertAlmostEqual(self.atime, new_atime, utimes_precision)
+             self.tearDown()
+ 
+     def tearDown(self):

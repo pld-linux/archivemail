@@ -1,0 +1,142 @@
+# Description: add, document and test --prefix option for archive name
+# Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=247340
+# Author: Serafeim Zanikolas <serzan@hellug.gr>
+# Last-Update: 2009-02-22
+Index: archivemail/archivemail
+===================================================================
+--- archivemail.orig/archivemail	2008-08-15 21:40:17.000000000 +0100
++++ archivemail/archivemail	2008-08-15 21:40:17.000000000 +0100
+@@ -171,6 +171,7 @@
+ 
+ class Options:
+     """Class to store runtime options, including defaults"""
++    archive_prefix       = None
+     archive_suffix       = "_archive"
+     archive_name         = None
+     days_old_max         = 180
+@@ -208,13 +209,14 @@
+ 
+         """
+         try:
+-            opts, args = getopt.getopt(args, '?D:S:Vd:hno:F:P:qs:uv', 
++            opts, args = getopt.getopt(args, '?D:S:Vd:hno:F:P:qs:uvp:', 
+                              ["date=", "days=", "delete", "dry-run", "help",
+                              "include-flagged", "no-compress", "output-dir=",
+-			     "archive-name=",
++                             "archive-name=",
+                              "filter-append=", "pwfile=", "dont-mangle",
+                              "preserve-unread", "quiet", "size=", "suffix=",
+-                             "verbose", "version", "warn-duplicate", "copy"])
++                             "verbose", "version", "warn-duplicate", "copy",
++                             "prefix="])
+         except getopt.error, msg:
+             user_error(msg)
+ 
+@@ -254,6 +256,8 @@
+                 self.dry_run = 1
+             if o in ('-q', '--quiet'):
+                 self.quiet = 1
++            if o in ('-p', '--prefix'):
++                self.archive_prefix = a
+             if o in ('-s', '--suffix'):
+                 self.archive_suffix = a
+             if o in ('-S', '--size'):
+@@ -682,6 +686,7 @@
+   -o, --output-dir=DIR  directory to store archives (default: same as original)
+   -P, --pwfile=FILE     file to read imap password from (default: None)
+   -F, --filter-append=STRING  append arbitrary string to the IMAP filter string
++  -p, --prefix=NAME     prefix for archive filename (default: none)
+   -s, --suffix=NAME     suffix for archive filename (default: '%s')
+       --archive-name=NAME  specify whole archive filename, overrides prefix
+                            and suffix
+@@ -1124,8 +1129,11 @@
+         final_archive_name = mailbox_name.split('/')[-1] + parsed_suffix
+     else:
+         final_archive_name = mailbox_name + parsed_suffix
++    if options.archive_prefix:
++        final_archive_name = os.path.join(os.path.dirname(final_archive_name),\
++                options.archive_prefix + os.path.basename(final_archive_name))
+     if options.archive_name:
+-	final_archive_name = options.archive_name
++        final_archive_name = options.archive_name
+     if options.output_dir:
+         final_archive_name = os.path.join(options.output_dir, 
+                 os.path.basename(final_archive_name))
+Index: archivemail/test_archivemail.py
+===================================================================
+--- archivemail.orig/test_archivemail.py	2008-08-15 21:40:17.000000000 +0100
++++ archivemail/test_archivemail.py	2008-08-15 21:40:17.000000000 +0100
+@@ -889,6 +889,54 @@
+         archivemail.options.archive_suffix = "_archive"
+         super(TestArchiveMboxSuffix, self).tearDown()
+ 
++class TestArchiveMboxPrefix(TestCaseInTempdir):
++    """make sure the 'prefix' option works"""
++    def setUp(self):
++        super(TestArchiveMboxPrefix, self).setUp()
++        archivemail.options.quiet = 1
++
++    def testPrefix(self):
++        """archiving with specified --prefix arguments"""
++        for prefix in ["blah-"]:
++            for execute in ("system_long", "system_short", "package"):
++                self.setUp()
++                days_old_max = 180
++                self.mbox_name = make_mbox(messages=3, 
++                    hours_old=(24 * (days_old_max+1)))
++                self.copy_name = tempfile.mkstemp()[1]
++                shutil.copyfile(self.mbox_name, self.copy_name)
++                if execute == "system_long":
++                    run = "./archivemail.py --quiet --prefix='%s' %s" % \
++                        (prefix, self.mbox_name)
++                    self.assertEqual(os.system(run), 0)
++                elif execute == "system_short":
++                    run = "./archivemail.py --quiet -p'%s' %s" % \
++                        (prefix, self.mbox_name)
++                    self.assertEqual(os.system(run), 0)
++                elif execute == "package":
++                    archivemail.options.archive_prefix = prefix
++                    archivemail.archive(self.mbox_name)
++                else:
++                    sys.exit(1)
++                assert(os.path.exists(self.mbox_name))
++                self.assertEqual(os.path.getsize(self.mbox_name), 0)
++
++                archive_name = os.path.join(os.path.dirname(self.mbox_name),\
++                        prefix + os.path.basename(self.mbox_name) +\
++                        "_archive.gz")
++                assert(os.path.exists(archive_name))
++                self.assertEqual(os.system("gzip -d %s" % archive_name), 0)
++                archive_name = re.sub("\.gz$", "", archive_name)
++                assert(os.path.exists(archive_name))
++                assert(filecmp.cmp(archive_name, self.copy_name, shallow=0))
++                os.remove(archive_name)
++                self.tearDown()
++
++    def tearDown(self):
++        archivemail.options.quiet = 0
++        archivemail.options.archive_prefix = None
++        super(TestArchiveMboxPrefix, self).tearDown()
++
+ 
+ class TestArchiveDryRun(TestCaseInTempdir):
+     """make sure the 'dry-run' option works"""
+Index: archivemail/archivemail.sgml
+===================================================================
+--- archivemail.orig/archivemail.sgml	2008-08-15 21:38:49.000000000 +0100
++++ archivemail/archivemail.sgml	2008-08-15 21:40:34.000000000 +0100
+@@ -170,6 +170,14 @@
+ 
+ <VarListEntry>
+ <Term>
++    <Option>-p <Replaceable/NAME/, --prefix=<Replaceable/NAME/</Option>
++</Term>
++<ListItem><Para>Prefix <Replaceable/NAME/ to the archive name.
++</Para></ListItem>
++</VarListEntry>
++
++<VarListEntry>
++<Term>
+     <Option>-s <Replaceable/NAME/, --suffix=<Replaceable/NAME/</Option>
+ </Term>
+ <ListItem><Para>

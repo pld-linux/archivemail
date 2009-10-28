@@ -1,0 +1,97 @@
+# Description: do not overwrite <mailbox>_archive.gz when it is a symbolic link
+# Bug-Debian: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=349068
+# Author: Serafeim Zanikolas <serzan@hellug.gr>
+# Last-Update: 2009-02-22
+Index: archivemail/archivemail
+===================================================================
+--- archivemail.orig/archivemail	2008-08-15 21:41:37.000000000 +0100
++++ archivemail/archivemail	2008-08-15 22:00:20.000000000 +0100
+@@ -487,6 +487,20 @@
+         """Return the current size of the mbox file"""
+         return os.path.getsize(self.mbox_file_name)
+ 
++    def get_link_target(self, file_name):
++        """Return the supplied file name if not a link; else its target."""
++        if not os.path.islink(file_name):
++            return file_name
++        orig_file_name = prev = file_name
++        while os.path.islink(file_name):
++            prev = file_name
++            file_name = os.readlink(file_name)
++        if not os.path.isabs(file_name):
++            file_name = os.path.abspath(os.path.join(os.path.dirname(prev),
++                                                     file_name))
++        if not os.path.exists(file_name):
++            unexpected_error("%s is a broken symbolic link" % orig_file_name)
++        return file_name
+ 
+ class RetainMbox(Mbox):
+     """Class for holding messages that will be retained from the original
+@@ -525,6 +539,7 @@
+         mode =  os.stat(self.__final_name)[stat.ST_MODE]
+         os.chmod(self.mbox_file_name, mode)
+ 
++        self.__final_name = self.get_link_target(self.__final_name)
+         vprint("renaming '%s' to '%s'" % (self.mbox_file_name, self.__final_name))
+         try:
+             os.rename(self.mbox_file_name, self.__final_name)
+@@ -615,6 +630,7 @@
+         final_name = self.__final_name
+         if not options.no_compress:
+             final_name = final_name + ".gz"
++        final_name = self.get_link_target(final_name)
+         vprint("renaming '%s' to '%s'" % (self.mbox_file_name, 
+             final_name))
+         try:
+@@ -1145,9 +1161,6 @@
+         tempfile.tempdir = new_temp_dir
+         vprint("set tempfile directory to '%s'" % new_temp_dir)
+ 
+-        if os.path.islink(mailbox_name):
+-            unexpected_error("'%s' is a symbolic link -- I feel nervous!" % 
+-                mailbox_name)
+         if imap_scheme == 'imap' or imap_scheme == 'imaps':
+             vprint("guessing mailbox is of type: imap(s)")
+             _archive_imap(mailbox_name, final_archive_name)
+Index: archivemail/test_archivemail.py
+===================================================================
+--- archivemail.orig/test_archivemail.py	2008-08-15 21:40:56.000000000 +0100
++++ archivemail/test_archivemail.py	2008-08-15 21:59:10.000000000 +0100
+@@ -99,6 +99,37 @@
+ 
+ ############ Mbox Class testing ##############
+ 
++class TestMboxSymLinkResolution(TestCaseInTempdir):
++    def setUp(self):
++        super(TestMboxSymLinkResolution, self).setUp()
++        self.mbox_file_name = make_mbox()
++        self.mbox = archivemail.Mbox(self.mbox_file_name)
++
++    def testAbsoluteSymlink(self):
++        """Resolve an absolute symlink in a different directory"""
++        link_name = "%s/symlink-to-mbox" % tempfile.mkdtemp()
++        os.symlink(self.mbox_file_name, link_name)
++        link_target = self.mbox.get_link_target(link_name)
++        self.assertEqual(self.mbox_file_name, link_target)
++
++    def testRelativeSymlink(self):
++        """Resolve a relative symlink in a different directory"""
++        link_dir = tempfile.mkdtemp()
++        link_name = "%s/symlink-to-mbox" % link_dir
++        run = "cd %s && ln -s ../%s %s" % (link_dir,\
++                os.path.basename(self.mbox_file_name),\
++                os.path.basename(link_name))
++        self.assertEqual(os.system(run), 0)
++        link_target = self.mbox.get_link_target(link_name)
++        self.assertEqual(self.mbox_file_name, link_target)
++
++    def testBrokenSymlink(self):
++        """Archive name that is a broken link should raise an error"""
++        link_name = "%s/symlink-to-mbox" % tempfile.mkdtemp()
++        os.symlink("%s-missing" % self.mbox_file_name, link_name)
++        self.assertRaises(archivemail.UnexpectedError,
++                self.mbox.get_link_target, link_name)
++
+ class TestMboxIsEmpty(TestCaseInTempdir):
+     def setUp(self):
+         super(TestMboxIsEmpty, self).setUp()
