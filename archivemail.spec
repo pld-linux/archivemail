@@ -1,3 +1,7 @@
+#
+# Conditional build:
+%bcond_without	tests		# build without tests
+
 Summary:	Archive and compress old email
 Summary(pl.UTF-8):	Archiwizowanie starej poczty
 Name:		archivemail
@@ -68,6 +72,11 @@ skrzynek pocztowych: IMAP, Maildir, MH oraz mbox.
 
 %build
 %{__python} setup.py build
+
+%if %{with tests}
+ln -sf archivemail archivemail.py
+%{__python} test_archivemail.py
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
