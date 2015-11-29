@@ -19,6 +19,7 @@ Patch4:		%{name}-add-prefix-switch.patch
 Patch5:		%{name}-add-archive-all-switch.patch
 Patch6:		%{name}-relax-timestamps-test.patch
 URL:		http://archivemail.sourceforge.net/
+BuildRequires:	rpmbuild(macros) >= 1.710
 BuildRequires:	python-devel >= 2.0
 %pyrequires_eq	python
 # for warnings.py
